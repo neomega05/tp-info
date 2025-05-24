@@ -1,0 +1,199 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+typedef struct {
+    char jour[3];
+    char mois[3];
+    char annee[5];
+} Date;
+typedef struct {
+    char *nom;
+    char reference[100];
+    float prix;
+    Date achat;
+} Produit;
+typedef struct Noeud {
+    Produit info;
+    struct Noeud *suivant;
+} Noeud;
+Noeud *initialiser_liste() {
+    return NULL;
+}
+int liste_vide(Noeud *tete) {
+    return tete == NULL;
+}
+Noeud *creer_produit() {
+    Noeud *n = (Noeud *)malloc(sizeof(Noeud));
+    if (!n) return NULL;
+    n->info.nom = (char *)malloc(100 * sizeof(char));
+    if (!n->info.nom) {
+        free(n);
+        return NULL;
+    }
+    printf("Nom du produit : ");
+    scanf("%s", n->info.nom);
+    printf("Référence du produit : ");
+    scanf("%s", n->info.reference);
+    printf("Montant : ");
+    scanf("%f", &n->info.prix);
+    printf("Date d'achat (JJ MM AAAA) : ");
+    scanf("%s %s %s", n->info.achat.jour, n->info.achat.mois, n->info.achat.annee);
+
+    n->suivant = NULL;
+    return n;
+}
+void afficher_un_produit(Noeud *n) {
+    if (n)
+        printf("Nom: %s, Référence: %s, Prix: %.2f, Date: %s/%s/%s\n",
+               n->info.nom, n->info.reference, n->info.prix,
+               n->info.achat.jour, n->info.achat.mois, n->info.achat.annee);
+}
+Noeud *ajouter_debut(Noeud *tete) {
+    Noeud *n = creer_produit();
+    if (n) n->suivant = tete;
+    return n;
+}
+void ajouter_fin(Noeud *tete) {
+    Noeud *n = creer_produit();
+    if (!tete) {
+        tete = n;
+    } else {
+        Noeud *tmp = tete;
+        while (tmp->suivant) tmp = tmp->suivant;
+        tmp->suivant = n;
+    }
+}
+void afficher_liste(Noeud *tete) {
+    if (liste_vide(tete)) {
+        printf("Liste vide.\n");
+        return;
+    }
+
+    Noeud *tmp = tete;
+    while (tmp) {
+        afficher_un_produit(tmp);
+        tmp = tmp->suivant;
+    }
+}
+int compter_elements(Noeud *tete) {
+    int cpt = 0;
+    while (tete) {
+        cpt++;
+        tete = tete->suivant;
+    }
+    return cpt;
+}
+void filtrer_par_date(Noeud *tete, Date d) {
+    while (tete) {
+        if (strcmp(tete->info.achat.jour, d.jour) == 0 &&
+            strcmp(tete->info.achat.mois, d.mois) == 0 &&
+            strcmp(tete->info.achat.annee, d.annee) == 0) {
+            afficher_un_produit(tete);
+        }
+        tete = tete->suivant;
+    }
+}
+Noeud *supprimer_debut(Noeud *tete) {
+    if (liste_vide(tete)) return NULL;
+    Noeud *tmp = tete;
+    tete = tete->suivant;
+    free(tmp->info.nom);
+    free(tmp);
+    return tete;
+}
+void supprimer_fin(Noeud *tete) {
+    if (liste_vide(tete)) {
+        printf("Liste vide.\n");
+        return;
+    }
+    if (!tete->suivant) {
+        free(tete->info.nom);
+        free(tete);
+        tete = NULL;
+        return;
+    }
+    Noeud *tmp = tete, *prec = NULL;
+    while (tmp->suivant) {
+        prec = tmp;
+        tmp = tmp->suivant;
+    }
+    prec->suivant = NULL;
+    free(tmp->info.nom);
+    free(tmp);
+}
+Noeud *supprimer_par_reference(Noeud *tete, char *ref) {
+    if (liste_vide(tete)) return NULL;
+
+    if (strcmp(tete->info.reference, ref) == 0) {
+        return supprimer_debut(tete);
+    }
+    Noeud *tmp = tete, *prec = NULL;
+    while (tmp && strcmp(tmp->info.reference, ref) != 0) {
+        prec = tmp;
+        tmp = tmp->suivant;
+    }
+    if (!tmp) {
+        printf("Produit non trouvé.\n");
+        return tete;
+    }
+    if (!tmp->suivant) {
+        supprimer_fin(tete);
+    } else {
+        prec->suivant = tmp->suivant;
+        free(tmp->info.nom);
+        free(tmp);
+    }
+    return tete;
+}
+int main() {
+    Noeud *liste = initialiser_liste();
+    int choix;
+    char ref[100];
+    Date d;
+    do {
+        printf("\nMenu :\n");
+        printf("1. Ajouter début\n");
+        printf("2. Ajouter fin\n");
+        printf("3. Afficher\n");
+        printf("4. Supprimer début\n");
+        printf("5. Supprimer fin\n");
+        printf("6. Supprimer par référence\n");
+        printf("7. Filtrer par date\n");
+        printf("8. Quitter\n");
+        printf("Choix : ");
+        scanf("%d", &choix);
+        switch (choix) {
+            case 1:
+                liste = ajouter_debut(liste);
+                break;
+            case 2:
+                ajouter_fin(liste);
+                break;
+            case 3:
+                afficher_liste(liste);
+                break;
+            case 4:
+                liste = supprimer_debut(liste);
+                break;
+            case 5:
+                supprimer_fin(liste);
+                break;
+            case 6:
+                printf("Référence à supprimer : ");
+                scanf("%s", ref);
+                liste = supprimer_par_reference(liste, ref);
+                break;
+            case 7:
+                printf("Date (JJ MM AAAA) : ");
+                scanf("%s %s %s", d.jour, d.mois, d.annee);
+                filtrer_par_date(liste, d);
+                break;
+            case 8:
+                printf("Fin du programme.\n");
+                break;
+            default:
+                printf("Choix invalide.\n");
+        }
+    } while (choix != 8);
+    return 0;
+}
