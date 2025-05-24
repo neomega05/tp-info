@@ -1,0 +1,112 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+typedef struct voiture{
+    char marque[30];
+    char modele[30];
+    int annee;
+    float prix;
+    struct voiture*suivant;
+} voiture;
+voiture*debut=NULL;
+voiture*creervoiture(){
+    voiture*nouvelle=(voiture*)malloc(sizeof(voiture));
+    printf("Marque:"); scanf("%s",nouvelle->marque);
+    printf("Modele:"); scanf("%s",nouvelle->modele);
+    printf("Annee:"); scanf("%d",&nouvelle->annee);
+    printf("Prix:"); scanf("%f",&nouvelle->prix);
+    nouvelle->suivant=NULL;
+    return nouvelle;
+}
+void ajouterDebut(){
+    voiture*v=creervoiture();
+    v->suivant=debut;
+    debut=v;
+}
+void afficherStock(){
+    voiture*temp=debut;
+    printf("\n stock de voitures \n");
+    while (temp!=NULL){
+        printf("marque: %s | modele: %s | annee: %d | prix: %.2f\n",
+               temp->marque,temp->modele,temp->annee,temp->prix);
+        temp=temp->suivant;
+    }
+}
+voiture*rechercher(char marque[],char modele[]){
+    voiture*temp=debut;
+    while(temp!=NULL){
+        if(strcmp(temp->marque,marque)==0&&strcmp(temp->modele,modele)== 0) {
+            return temp;
+        }
+        temp=temp->suivant;
+    }
+    return NULL;
+}
+void supprimervoiture(){
+    char marque[30],modele[30];
+    printf("entrez la marque et le modele à supprimer : ");
+    scanf("%s%s",marque,modele);
+    voiture*temp= debut,*prec= NULL;
+    while (temp!=NULL) {
+        if(strcmp(temp->marque,marque)== 0 && strcmp(temp->modele,modele)== 0) {
+            if (prec==NULL)debut=temp->suivant;
+            else prec->suivant=temp->suivant;
+            free(temp);
+            printf("voiture supprimée.\n");
+            return;
+        }
+        prec= temp;
+        temp= temp->suivant;
+    }
+    printf("voiture introuvable.\n");
+}
+void modifiervoiture(){
+    char marque[30],modele[30];
+    printf("marque et modele de la voiture à modifier :");
+    scanf("%s%s",marque,modele);
+    voiture*v =rechercher(marque,modele);
+    if (v){
+        printf("nouveaux détails :\n");
+        printf("nouvelle marque :"); scanf("%s",v->marque);
+        printf("nouveau modele :"); scanf("%s",v->modele);
+        printf("nouvelle annee :"); scanf("%d",&v->annee);
+        printf("nouveau prix :"); scanf("%f",&v->prix);
+        printf("modification réussie.\n");
+    } else {
+        printf("voiture non trouvée.\n");
+    }
+}
+void menu(){
+    int choix;
+    do {
+        printf("\n Menu Principal \n");
+        printf("1-Ajouter une voiture\n");
+        printf("2-Modifier une voiture\n");
+        printf("3-Supprimer une voiture\n");
+        printf("4-Rechercher une voiture\n");
+        printf("5-Afficher le stock\n");
+        printf("0-Quitter\n");
+        printf("votre choix:");
+        scanf("%d",&choix);
+        switch (choix) {
+            case 1: ajouterDebut();break;
+            case 2: modifiervoiture();break;
+            case 3: supprimervoiture();break;
+            case 4: {
+                char m[30],mo[30];
+                printf("marque et modele:");
+                scanf("%s%s",m,mo);
+                voiture* v= rechercher(m, mo);
+                if (v)printf("trouvée :%s%s%d%.2f\n", v->marque,v->modele,v->annee,v->prix);
+                else printf("voiture non trouvée.\n");
+                break;
+            }
+            case 5:afficherStock(); break;
+        }
+    } while(choix!= 0);
+}
+int main(){
+    menu();
+    return 0;
+}
