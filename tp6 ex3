@@ -1,0 +1,16 @@
+#include <stdio.h>
+int main(){
+    FILE*source = fopen("source.txt","r");
+    FILE*destination = fopen("destination.txt","w");
+    if (source==NULL || destination==NULL){
+        printf("Erreur lors de l'ouverture d'un des fichiers.\n");
+        return 1;
+    }
+    char caractere;
+    while((caractere=fgetc(source))! EOF){
+        fputc(caractere,destination);
+    }
+    fclose(source);
+    fclose(destination);
+    return 0;
+}
