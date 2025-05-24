@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct Noeud {
+    int data;
+    struct Noeud*next;
+} Noeud;
+void push(Noeud** top, int valeur){
+    Noeud*nouveau=(Noeud*)malloc(sizeof(Noeud));
+    nouveau->data=valeur;
+    nouveau->next=*top;
+    *top=nouveau;
+}
+void pop(Noeud**top){
+    if(*top==NULL)return;
+    Noeud*temp =*top;
+    *top=(*top)->next;
+    free(temp);
+}
+void peek(Noeud*top){
+    if(top != NULL)
+        printf("Sommet de la pile: %d\n",top->data);
+    else
+        printf("La pile est vide\n");
+}
+void afficher(Noeud*top){
+    printf("Pile:");
+    while(top!=NULL){
+        printf("%d ",top->data);
+        top=top->next;
+    }
+    printf("\n");
+}
+int taille(Noeud*top){
+    int count=0;
+    while(top!=NULL){
+        count++;
+        top=top->next;
+    }
+    return count;
+}
