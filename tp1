@@ -1,0 +1,205 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct Noeud{
+    int val;
+    struct Noeud *next;
+}
+Noeud;
+Noeud *create(int v){
+    Noeud *nouveauNoeud=(Noeud *)malloc(sizeof(Noeud));
+    nouveauNoeud->val=v;
+    nouveauNoeud->next=NULL;
+    return nouveauNoeud;
+}
+void display(Noeud*head){
+    Noeud*curr=head;
+    while(curr != NULL){
+        printf("valeur : %d\n", curr->val);
+        curr=curr->next;
+    }
+}
+Noeud*addFirst(Noeud*head,intv) {
+    Noeud*nouveauNoeud=(Noeud *)malloc(sizeof(Noeud));
+    nouveauNoeud->val=v;
+    nouveauNoeud->next=head;
+    return nouveauNoeud;
+}
+Noeud*addLast(Noeud*head,int v) {
+    Noeud*nouveauNoeud=(Noeud*)malloc(sizeof(Noeud));
+    nouveauNoeud->val=v;
+    nouveauNoeud->next=NULL;
+    if(head==NULL)
+        return nouveauNoeud;
+    Noeud*curr=head;
+    while(curr->next!=NULL)
+        curr=curr->next;
+    curr->next=nouveauNoeud;
+    return head;
+}
+void search(Noeud *head,int v){
+    Noeud*curr=head;
+    int found=0;
+    while (curr!=NULL){
+        if (curr->val==v){
+            found=1;
+            break;
+        }
+        curr=curr->next;
+    }
+    if (found)
+        printf("valeur trouvée\n");
+    else
+        printf("valeur non trouvée\n");
+}
+int length(Noeud *head){
+    int count = 0;
+    Noeud*curr=head;
+    while(curr!=NULL){
+        count++;
+        curr=curr->next;
+    }
+    return count;
+}
+Noeud *insertAt(Noeud *head, int pos, int v){
+    if(pos < 1 || pos > length(head) + 1){
+        printf("position invalide\n");
+        return head;
+    }
+    Noeud*nouveauNoeud=(Noeud *)malloc(sizeof(Noeud));
+    nouveauNoeud->val=v;
+    nouveauNoeud->next=NULL;
+    if(pos==1) {
+        nouveauNoeud->next=head;
+        return nouveauNoeud;
+    }
+    Noeud*curr=head;
+    for(int i = 1; i < pos - 1; i++)
+        curr=curr->next;
+    nouveauNoeud->next=curr->next;
+    curr->next=nouveauNoeud;
+    return head;
+}
+Noeud*deleteFirst(Noeud*head) {
+    if(head==NULL) {
+        printf("liste vide\n");
+        return NULL;
+    }
+    Noeud*tmp=head;
+    head=head->next;
+    free(tmp);
+    return head;
+}
+Noeud*deleteLast(Noeud*head) {
+    if(head==NULL) {
+        printf("liste vide\n");
+        return NULL;
+    }
+    if(head->next==NULL) {
+        free(head);
+        return NULL;
+    }
+    Noeud*curr=head;
+    while(curr->next->next!=NULL)
+        curr=curr->next;
+    free(curr->next);
+    curr->next=NULL;
+    return head;
+}
+Noeud*deleteAt(Noeud*head,int pos) {
+    if(head==NULL) {
+        printf("liste vide\n");
+        return NULL;
+    }
+    int size=length(head);
+    if(pos < 1 || pos > size) {
+        printf("position invalide\n");
+        return head;
+    }
+    if(po ==1){
+        Noeud*tmp=head;
+        head=head->next;
+        free(tmp);
+        return head;
+    }
+    Noeud*curr=head;
+    for(int i = 1; i < pos - 1; i++)
+        curr=curr->next;
+    Noeud*tmp=curr->next;
+    curr->next=tmp->next;
+    free(tmp);
+    return head;
+}
+Noeud*updateFirst(Noeud*head,int v) {
+    if(head!=NULL)
+        head->val=v;
+    return head;
+}
+Noeud*updateLast(Noeud*head,int v) {
+    if(head==NULL) {
+        printf("liste vide\n");
+        return NULL;
+    }
+    Noeud*curr=head;
+    while(curr->next!=NULL)
+        curr=curr->next;
+    curr->val=v;
+    return head;
+}
+Noeud*updateAt(Noeud*head,int pos,int v){
+    if(head==NULL){
+        printf("liste vide\n");
+        return NULL;
+    }
+    int size=length(head);
+    if(pos < 1 || pos > size){
+        printf("position invalide\n");
+        return head;
+    }
+    Noeud *curr=head;
+    for(int i = 1; i < pos; i++)
+        curr=curr->next;
+    curr->val=v;
+    return head;
+}
+int main(){
+    Noeud*head=NULL;
+    Noeud*a=create(10);
+    Noeud*b=create(20);
+    Noeud*c=create(30);
+    head=a;
+    a->next=b;
+    b->next=c;
+    display(head);
+    printf("----- Ajout au début -----\n");
+    head=addFirst(head,100);
+    display(head);
+    printf("----- Ajout à la fin -----\n");
+    head=addLast(head,200);
+    display(head);
+    printf("----- Recherche -----\n");
+    search(head,20);
+    printf("----- Taille -----\n");
+    printf("taille : %d\n",length(head));
+    printf("----- Insertion -----\n");
+    head=insertAt(head, 3, 555);
+    display(head);
+    printf("----- Suppression début -----\n");
+    head=deleteFirst(head);
+    display(head);
+    printf("----- Suppression fin -----\n");
+    head=deleteLast(head);
+    display(head);
+    printf("----- Suppression position -----\n");
+    head=deleteAt(head, 4);
+    display(head);
+    printf("----- Modifier début -----\n");
+    head=updateFirst(head, 2024);
+    display(head);
+    printf("----- Modifier fin -----\n");
+    head=updateLast(head, 2025);
+    display(head);
+    printf("----- Modifier position -----\n");
+    head=updateAt(head, 1, 2000);
+    display(head);
+    return 0;
+}
