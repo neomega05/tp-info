@@ -1,0 +1,245 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct Node {
+    int data;
+    struct Node *next;
+    struct Node *prev;
+} Node;
+Node *create(int value) {
+    Node *newNode = (Node *)malloc(sizeof(Node));
+    newNode->data = value;
+    newNode->next = NULL;
+    newNode->prev = NULL;
+    return newNode;
+}
+void display(Node *head) {
+    Node *current = head;
+    while (current != NULL) {
+        printf("Valeur: %d | Adresse: %p | Suivant: %p | Precedent: %p\n",
+               current->data, current, current->next, current->prev);
+        current = current->next;
+    }
+}
+Node *displayReverse(Node *head) {
+    if (head == NULL) return NULL;
+    Node *current = head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    while (current != NULL) {
+        printf("Valeur (inverse): %d\n", current->data);
+        current = current->prev;
+    }
+    return NULL;
+}
+void addAtStart(Node **head, int value) {
+    Node *newNode = create(value);
+    newNode->next = *head;
+    if (*head != NULL) {
+        (*head)->prev = newNode;
+    }
+    *head = newNode;
+}
+Node *addAtEnd(Node *head, int value) {
+    Node *newNode = create(value);
+    if (head == NULL) {
+        return newNode;
+    }
+    Node *current = head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    current->next = newNode;
+    newNode->prev = current;
+    return head;
+}
+int getSize(Node *head) {
+    int count = 0;
+    Node *current = head;
+    while (current != NULL) {
+        count++;
+        current = current->next;
+    }
+    return count;
+}
+Node *insertAt(Node *head, int value, int position) {
+    if (position < 1 || position > getSize(head) + 1) {
+        printf("Position invalide\n");
+        return head;
+    }
+    Node *newNode = create(value);
+    if (position == 1) {
+        newNode->next = head;
+        if (head != NULL) head->prev = newNode;
+        return newNode;
+    }
+    Node *current = head;
+    int i = 1;
+    while (current != NULL && i < position - 1) {
+        current = current->next;
+        i++;
+    }
+    newNode->next = current->next;
+    if (current->next != NULL) {
+        current->next->prev = newNode;
+    }
+    newNode->prev = current;
+    current->next = newNode;
+    return head;
+}
+Node *search(Node *head, int value) {
+    Node *current = head;
+    while (current != NULL) {
+        if (current->data == value) return current;
+        current = current->next;
+    }
+    return NULL;
+}
+Node *removeFirst(Node *head) {
+    if (head == NULL) {
+        printf("La liste est vide\n");
+        return NULL;
+    }
+    Node *tmp = head;
+    head = head->next;
+    if (head != NULL) head->prev = NULL;
+    free(tmp);
+    return head;
+}
+Node *removeLast(Node *head) {
+    if (head == NULL) {
+        printf("La liste est vide\n");
+        return NULL;
+    }
+    Node *current = head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    if (current->prev != NULL) {
+        current->prev->next = NULL;
+    } else {
+        head = NULL;
+    }
+    free(current);
+    return head;
+}
+Node *removeAt(Node *head, int position) {
+    if (position < 1 || position > getSize(head)) {
+        printf("Position invalide\n");
+        return head;
+    }
+    Node *current = head;
+    for (int i = 1; i < position; i++) {
+        current = current->next;
+    }
+    if (current->prev != NULL) {
+        current->prev->next = current->next;
+    } else {
+        head = current->next;
+    }
+    if (current->next != NULL) {
+        current->next->prev = current->prev;
+    }
+    free(current);
+    return head;
+}
+Node *updateFirst(Node *head, int value) {
+    if (head != NULL) {
+        head->data = value;
+    }
+    return head;
+}
+Node *updateLast(Node *head, int value) {
+    if (head == NULL) return NULL;
+    Node *current = head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    current->data = value;
+    return head;
+}
+Node *updateAt(Node *head, int position, int value) {
+    if (position < 1 || position > getSize(head)) {
+        printf("Position invalide\n");
+        return head;
+    }
+    Node *current = head;
+    for (int i = 1; i < position; i++) {
+        current = current->next;
+    }
+    current->data = value;
+    return head;
+}
+Node *selectionSort(Node *head) {
+    if (head == NULL || head->next == NULL) return head;
+    Node *i = head;
+    while (i != NULL) {
+        Node *min = i;
+        Node *j = i->next;
+        while (j != NULL) {
+            if (j->data < min->data) {
+                min = j;
+            }
+            j = j->next;
+        }
+        if (min != i) {
+            int tmp = i->data;
+            i->data = min->data;
+            min->data = tmp;
+        }
+        i = i->next;
+    }
+    return head;
+}
+int main() {
+    Node *head = NULL;
+    Node *n1 = create(10);
+    Node *n2 = create(20);
+    Node *n3 = create(30);
+    head = n1;
+    n1->next = n2;
+    n2->prev = n1;
+    n2->next = n3;
+    n3->prev = n2;
+    printf("=== Affichage initial ===\n");
+    display(head);
+    printf("\n=== Affichage inverse ===\n");
+    displayReverse(head);
+    printf("\n=== Ajout au début (40) ===\n");
+    addAtStart(&head, 40);
+    display(head);
+    printf("\n=== Ajout à la fin (400) ===\n");
+    head = addAtEnd(head, 400);
+    display(head);
+    printf("\n=== Insertion à la position 2 (2400) ===\n");
+    head = insertAt(head, 2400, 2);
+    display(head);
+    printf("\n=== Recherche de l'élément 1000 ===\n");
+    if (search(head, 1000)) {
+        printf("La valeur existe\n");
+    } else {
+        printf("La valeur n'existe pas\n");
+    }
+    printf("\n=== Modification du premier élément (35) ===\n");
+    head = updateFirst(head, 35);
+    display(head);
+    printf("\n=== Modification du dernier élément (20) ===\n");
+    head = updateLast(head, 20);
+    display(head);
+    printf("\n=== Modification à la position 2 (100) ===\n");
+    head = updateAt(head, 2, 100);
+    display(head);
+    printf("\n=== Suppression du premier élément ===\n");
+    head = removeFirst(head);
+    display(head);
+    printf("\n=== Suppression du dernier élément ===\n");
+    head = removeLast(head);
+    display(head);
+    printf("\n=== Suppression à la position 4 ===\n");
+    head = removeAt(head, 4);
+    display(head);
+    printf("\n=== Tri de la liste ===\n");
+    head=selectionSort(head);
+    display(head);
+    return 0;
+}
