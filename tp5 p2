@@ -1,0 +1,38 @@
+typedef struct NoeudFile{
+    int data;
+    struct NoeudFile* next;
+} 
+NoeudFile;
+NoeudFile*front=NULL;
+NoeudFile*rear=NULL;
+void Enfiler(int value){
+    NoeudFile* nouveau=(NoeudFile*)malloc(sizeof(NoeudFile));
+    nouveau->data=value;
+    nouveau->next=NULL;
+    if (rear==NULL) {
+        front=rear=nouveau;
+    } else {
+        rear->next=nouveau;
+        rear=nouveau;
+    }
+}
+void Defiler(){
+    if(front==NULL)return;
+    NoeudFile*temp=front;
+    front=front->next;
+    if(front==NULL) rear=NULL;
+    free(temp);
+}
+void afficherFile(NoeudFile*ptr){
+    printf("File:");
+    while(ptr!=NULL){
+        printf("%d ",ptr->data);
+        ptr=ptr->next;
+    }
+    printf("\n");
+}
+void viderFile(){
+    while(front!=NULL){
+        Defiler();
+    }
+}
