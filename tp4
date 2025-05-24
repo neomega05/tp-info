@@ -1,0 +1,182 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+typedef struct Eleve{
+    int id;
+    char nom[50];
+    float moyenne;
+    struct Eleve*suivant;
+    struct Eleve*precedent;
+} Eleve;
+Eleve*creer_eleve(){
+    Eleve*nouveau=(Eleve*)malloc(sizeof(Eleve));
+    printf("ID: ");
+    scanf("%d", &nouveau->id);
+    printf("Nom: ");
+    scanf("%s", nouveau->nom);
+    printf("Moyenne: ");
+    scanf("%f",&nouveau->moyenne);
+    nouveau->suivant=NULL;
+    nouveau->precedent=NULL;
+    return nouveau;
+}
+int longueur(Eleve* debut){
+    int taille=0;
+    while(debut!=NULL){
+        taille++;
+        debut=debut->suivant;
+    }
+    return taille;
+}
+Eleve*ajouter_position(Eleve*debut,Eleve* nouveau,int position){
+    if (position==0 || debut==NULL){
+        nouveau->suivant = debut;
+        if(debut)debut->precedent=nouveau;
+        return nouveau;
+    }
+    Eleve*courant=debut;
+    int index=0;
+    while(courant!=NULL&&index position - 1){
+        courant=courant->suivant;
+        index++;
+    }
+    if(courant!=NULL){
+        nouveau->suivant=courant->suivant;
+        if(courant->suivant)courant->suivant->precedent=nouveau;
+        courant->suivant=nouveau;
+        nouveau->precedent=courant;
+    }
+    return debut;
+}
+void afficher_liste(Eleve* debut){
+    Eleve* courant = debut;
+    while (courant != NULL) {
+        printf("ID: %d,Nom: %s,Moyenne: %.2f\n",courant->id,courant->nom,courant->moyenne);
+        courant=courant->suivant;
+    }
+}
+Eleve*modifier_moyenne(Eleve*debut,int position,float nouvelleMoyenne){
+    Eleve*courant=debut;
+    int index=0;
+    while(courant!=NULL && index<position){
+        courant=courant->suivant;
+        index++;
+    }
+    if(courant!=NULL)
+        courant->moyenne=nouvelleMoyenne;
+    return debut;
+}
+Eleve*supprimer_position(Eleve* debut,int position){
+    Eleve*courant=debut;
+    int index=0;
+    while(courant!=NULL&&index< position){
+        courant=courant->suivant;
+        index++;
+    }
+    if(courant!=NULL){
+        if(courant->precedent!=NULL)
+            courant->precedent->suivant=courant->suivant;
+        else
+            debut=courant->suivant;
+        if(courant->suivant!=NULL)
+            courant->suivant->precedent=courant->precedent;
+        free(courant);
+    }
+    return debut;
+}
+Eleve*derniere_cellule(Eleve*debut){
+    Eleve*courant=debut;
+    while(courant&& courant->suivant!=NULL){
+        courant=courant->suivant;
+    }
+    return courant;
+}
+void afficher_liste_inverse(Eleve*dernier){
+    Eleve*courant=dernier;
+    while(courant!=NULL){
+        printf("ID: %d,Nom: %s,Moyenne: %.2f\n" courant->id,courant->nom,courant->moyenne);
+        courant=courant->precedent;
+    }
+}
+int chercher_eleve(Eleve*debut,int id){
+    Eleve*courant=debut;
+    while(courant != NULL){
+        if (courant->id==id)
+            return 1;
+        courant=courant->suivant;
+    }
+    return 0;
+}
+Eleve*trier_par_moyenne(Eleve*debut){
+    if(!debut) return NULL;
+    int permutation;
+    Eleve*courant;
+    Eleve*fin=NULL;
+    do {
+        permutation=0;
+        courant=debut;
+        while (courant->suivant!=fin){
+            if (courant->moyenne>courant->suivant->moyenne){
+                int id_tmp=courant->id;
+                char nom_tmp[50];
+                strcpy(nom_tmp,courant->nom);
+                float moy_tmp=courant->moyenne;
+                courant->id=courant->suivant->id;
+                strcpy(courant->nom, courant->suivant->nom);
+                courant->moyenne=courant->suivant->moyenne;
+                courant->suivant->id=id_tmp;
+                strcpy(courant->suivant->nom,nom_tmp);
+                courant->suivant->moyenne=moy_tmp;
+                permutation=1;
+            }
+            courant=courant->suivant;
+        }
+        fin=courant;
+    } while(permutation);
+    return debut;
+}
+int main() {
+    Eleve*debut=NULL;
+    printf("Création de 3 élèves :\n");
+    Eleve*eleve1=creer_eleve();
+    Eleve*eleve2=creer_eleve();
+    Eleve*eleve3=creer_eleve();
+    printf("Ajout de chaque élève dans sa position:\n");
+    debut=ajouter_position(debut,eleve1,0);
+    debut=ajouter_position(debut,eleve2,1);
+    debut=ajouter_position(debut,eleve3,1);
+    printf("\nListe des élèves :\n");
+    afficher_liste(debut);
+    int longueurListe=longueur(debut);
+    printf("\nLongueur de la liste:%d\n",longueurListe);
+    int idRecherche;
+    printf("\nEntrer l'ID à rechercher:");
+    scanf("%d",&idRecherche);
+    int resultatRecherche=chercher_eleve(debut, idRecherche);
+    if(resultatRecherche)
+        printf("Résultat de recherche:Trouvé\n");
+    else
+        printf("Résultat de recherche:Non trouvé\n");
+    int positionSuppression;
+    printf("\nEntrer la position à supprimer:");
+    scanf("%d",&positionSuppression);
+    debut=supprimer_position(debut,positionSuppression);
+    printf("\nListe après suppression:\n");
+    afficher_liste(debut);
+    int positionModification;
+    float nouvelleMoyenne;
+    printf("\nEntrer la position à modifier:");
+    scanf("%d",&positionModification);
+    printf("Entrer la nouvelle moyenne:");
+    scanf("%f",&nouvelleMoyenne);
+    debut=modifier_moyenne(debut,positionModification,nouvelleMoyenne);
+    printf("\nListe après modification de moyenne :\n");
+    afficher_liste(debut);
+    debut=trier_par_moyenne(debut);
+    printf("\nListe triée par moyenne :\n");
+    afficher_liste(debut);
+    printf("\nAffichage en sens inverse :\n");
+    Eleve*dernier = derniere_cellule(debut);
+    afficher_liste_inverse(dernier);
+    return 0;
+}
