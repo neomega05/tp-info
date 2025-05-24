@@ -1,0 +1,17 @@
+#include <stdio.h>
+int main(){
+    FILE *fichier = fopen("donnees.txt", "w");
+    if (fichier == NULL){
+        printf("Erreur lors de l'ouverture du fichier.\n");
+        return 1;
+    }
+    char nom[50];
+    int age;
+    printf("Entrez votre nom:");
+    scanf("%s",nom);
+    printf("Entrez votre âge:");
+    scanf("%d",&age);
+    fprintf(fichier,"Nom: %s\nAge: %d\n",nom,age);
+    fclose(fichier);
+    return 0;
+}
