@@ -1,0 +1,14 @@
+#include <stdio.h>
+int main(){
+    FILE*fichier=fopen("donnees.txt","r");
+    if(fichier==NULL){
+        printf("Erreur lors de l'ouverture du fichier\n");
+        return 1;
+    }
+    char ligne[100];
+    while(fgets(ligne,sizeof(ligne),fichier)!=NULL){
+        printf("%s",ligne);
+    }
+    fclose(fichier);
+    return 0;
+}
